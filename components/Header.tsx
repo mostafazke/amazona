@@ -3,16 +3,20 @@ import React from 'react';
 
 function Header() {
   return (
-    <header className="bg-[#453C67] py-3 px-6 shadow-md">
+    <header className="bg-primary py-3 px-6 shadow-md">
       <nav className="flex justify-between">
         <div className="flex items-center">
           <Link href="/">
-            <span className="text-lg font-semibold text-[#F2F7A1]">Amazona</span>
+            <span className="text-lg font-semibold text-secondary">
+              Amazona
+            </span>
           </Link>
         </div>
 
         <div className="ml-2 flex">
-          <Link href="/cart" className="flex cursor-pointer items-center gap-x-1 py-2 px-4 text-white hover:text-gray-500  transition-colors">
+          <Link
+            href="/cart"
+            className="flex cursor-pointer items-center gap-x-1 py-2 px-4 text-white hover:text-gray-500  transition-colors">
             <div className="relative">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +32,9 @@ function Header() {
             <span className="text-sm font-medium">Cart</span>
           </Link>
 
-          <Link href="/login" className="ml-2 flex cursor-pointer items-center gap-x-1 rounded-md border py-2 px-4 text-white hover:bg-gray-100  hover:text-gray-500 transition-colors">
+          <Link
+            href="/login"
+            className="ml-2 flex cursor-pointer items-center gap-x-1 rounded-md border py-2 px-4 text-white hover:bg-gray-100  hover:text-gray-500 transition-colors">
             <span className="text-sm font-medium">Sign in</span>
           </Link>
         </div>
