@@ -1,13 +1,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useContext } from 'react';
 import Layout from '../../components/Layout';
 import { Product } from '../../models';
+import { AddCartItem } from '../../store/Actions';
+import { Store } from '../../store/Store';
 import data from '../../utils/data';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 function ProductPage() {
+  const { state, dispatch } = useContext(Store);
   const { query } = useRouter();
   const { slug } = query;
   const product: Product | undefined = data.products.find(
@@ -16,6 +19,20 @@ function ProductPage() {
   if (!product) {
     return <div>Product not found.</div>;
   }
+
+  const addToCartHandler = () => {
+    const existItem = state.cart.cartItems.find(
+      (item) => item.slug === product.slug
+    );
+    const quantity = existItem ? (existItem.quantity || 0) + 1 : 1;
+
+    if (product.countInStock < quantity) {
+      alert('Sorry, Product is out of stock.')
+      return;
+    }
+    dispatch(new AddCartItem({ ...product, quantity }));
+  };
+
   return (
     <Layout title={product.name}>
       <div className="py-2">
@@ -53,7 +70,11 @@ function ProductPage() {
               <h4>Status</h4>
               <p>{product.countInStock > 0 ? 'In stock' : 'Unavailavle'}</p>
             </div>
-            <button className="primary-button w-full">Add to cart</button>
+            <button
+              className="primary-button w-full"
+              onClick={addToCartHandler}>
+              Add to cart
+            </button>
           </div>
         </div>
       </section>

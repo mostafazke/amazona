@@ -11,4 +11,5 @@ export interface Product {
   description: string;
   isFeatured?: boolean;
   banner?: string;
+  quantity?: number;
 }
