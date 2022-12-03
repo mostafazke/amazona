@@ -47,7 +47,7 @@ function ProductPage() {
             height={640}
           />
         </div>
-        <div className="one">
+        <div>
           <ul>
             <li>
               <h1 className="text-lg">{product.name}</h1>

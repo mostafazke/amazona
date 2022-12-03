@@ -19,7 +19,7 @@ function Layout({ children, title }: Props) {
 
       <div className="min-h-screen flex flex-col justify-between">
         <Header />
-        <main className="container m-auto my-4 px-4">{children}</main>
+        <main className="container m-auto mt-4 px-4">{children}</main>
         <Footer />
       </div>
     </>
