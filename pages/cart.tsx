@@ -5,7 +5,7 @@ import { XCircleIcon } from '@heroicons/react/24/outline';
 
 import Layout from '../components/Layout';
 import { Product } from '../models';
-import { RemoveCartItem } from '../store/Actions';
+import { ChangeCartQuantity, RemoveCartItem } from '../store/Actions';
 import { Store } from '../store/Store';
 import { formatCurrency } from '../utils/formatCurrency';
 import { useRouter } from 'next/router';
@@ -20,6 +20,19 @@ function Cart() {
   );
   const handleRemoveItem = (product: Product) => {
     dispatch(new RemoveCartItem(product));
+  };
+  const handleChangeQuantity = ({
+    slug,
+    quantity,
+  }: {
+    slug: string;
+    quantity: string;
+  }) => {
+    const paylaod = {
+      slug,
+      quantity: +quantity,
+    };
+    dispatch(new ChangeCartQuantity(paylaod));
   };
 
   if (!cart.cartItems.length) {
@@ -42,7 +55,7 @@ function Cart() {
 
             <div className="overflow-x-auto p-3">
               <table className="table-auto w-full">
-                <thead className="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                <thead className="text-xs uppercase text-gray-400 bg-gray-50">
                   <tr>
                     <th></th>
                     <th className="p-2">
@@ -81,7 +94,24 @@ function Cart() {
                         </Link>
                       </td>
                       <td className="p-2">
-                        <div className="text-left">{product.quantity}</div>
+                        <div className="text-left">
+                          <select
+                            value={product.quantity}
+                            onChange={(e) =>
+                              handleChangeQuantity({
+                                slug: product.slug,
+                                quantity: e.target.value,
+                              })
+                            }>
+                            {[...Array(product.countInStock).keys()].map(
+                              (i) => (
+                                <option key={i + 1} value={i + 1}>
+                                  {i + 1}
+                                </option>
+                              )
+                            )}
+                          </select>
+                        </div>
                       </td>
                       <td className="p-2">
                         <div className="text-left font-medium text-green-500">

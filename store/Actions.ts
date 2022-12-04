@@ -3,6 +3,7 @@ import { Product } from '../models';
 
 export const Add_Cart_Item = '[Cart] Add_Cart_Item';
 export const Remove_Cart_Item = '[Cart] Remove_Cart_Item';
+export const Change_Cart_Quantity = '[Cart] Change_Cart_Quantity';
 
 export class AddCartItem {
   readonly type = Add_Cart_Item;
@@ -13,4 +14,9 @@ export class RemoveCartItem {
   constructor(public payload: Product) {}
 }
 
-export type ActionTypes = AddCartItem | RemoveCartItem;
+export class ChangeCartQuantity {
+  readonly type = Change_Cart_Quantity;
+  constructor(public payload: {slug: string, quantity: number}) {}
+}
+
+export type ActionTypes = AddCartItem | RemoveCartItem | ChangeCartQuantity;

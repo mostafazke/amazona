@@ -1,5 +1,5 @@
 import { Product } from '../models';
-import { ActionTypes, Add_Cart_Item, Remove_Cart_Item } from './Actions';
+import { ActionTypes, Add_Cart_Item, Change_Cart_Quantity, Remove_Cart_Item } from './Actions';
 
 export interface State {
   cart: {
@@ -37,14 +37,21 @@ export const reducer = (
       if (!existItem) {
         return state;
       }
-      const cartItems =
-        existItem.quantity! > 1
-          ? state.cart.cartItems.map((item) =>
-              item.name === existItem.name
-                ? { ...existItem, quantity: existItem.quantity! - 1 }
-                : item
-            )
-          : state.cart.cartItems.filter((item) => item.slug != payload.slug);
+      const cartItems = state.cart.cartItems.filter(
+        (item) => item.slug != payload.slug
+      );
+      return { ...state, cart: { ...state.cart, cartItems } };
+    }
+    case Change_Cart_Quantity: {
+      const existItem = state.cart.cartItems.find(
+        (item) => item.slug === payload.slug
+      );
+      if (!existItem) {
+        return state;
+      }
+      const cartItems = state.cart.cartItems.map(
+        (item) => item.slug === payload.slug ? {...item, quantity: payload.quantity} : item
+      );
       return { ...state, cart: { ...state.cart, cartItems } };
     }
 
