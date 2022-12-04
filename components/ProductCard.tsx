@@ -1,34 +1,17 @@
-// import Image from 'next/image';
 import Link from 'next/link';
-import React, { useContext } from 'react';
 import { Product } from '../models';
-import { AddCartItem } from '../store/Actions';
-import { Store } from '../store/Store';
 import { formatCurrency } from '../utils/formatCurrency';
 
 type Props = {
   product: Product;
+  // eslint-disable-next-line no-unused-vars
+  addToCartHandler: (product: Product) => void;
 };
 
-export function ProductCard({ product }: Props) {
-  const { state, dispatch } = useContext(Store);
-
+export function ProductCard({ product, addToCartHandler }: Props) {
   if (!product) {
     return <div>Loading</div>;
   }
-
-  const addToCartHandler = () => {
-    const existItem = state.cart.cartItems.find(
-      (item) => item.slug === product.slug
-    );
-    const quantity = existItem ? (existItem.quantity || 0) + 1 : 1;
-
-    if (product.countInStock < quantity) {
-      alert('Sorry, Product is out of stock.');
-      return;
-    }
-    dispatch(new AddCartItem({ ...product, quantity }));
-  };
 
   return (
     <article className="card hover:scale-105 transition-transform">
@@ -56,7 +39,7 @@ export function ProductCard({ product }: Props) {
       <button
         className="primary-button w-full"
         type="button"
-        onClick={addToCartHandler}>
+        onClick={() => addToCartHandler(product)}>
         <span>Add to cart</span>
       </button>
     </article>

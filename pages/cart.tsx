@@ -9,6 +9,7 @@ import { ChangeCartQuantity, RemoveCartItem } from '../store/Actions';
 import { Store } from '../store/Store';
 import { formatCurrency } from '../utils/formatCurrency';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
 function Cart() {
   const router = useRouter();
@@ -161,4 +162,4 @@ function Cart() {
   );
 }
 
-export default Cart;
+export default dynamic(() => Promise.resolve(Cart), { ssr: false });

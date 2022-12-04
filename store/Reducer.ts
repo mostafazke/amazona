@@ -1,16 +1,23 @@
+import Cookie from 'js-cookie';
 import { Product } from '../models';
-import { ActionTypes, Add_Cart_Item, Change_Cart_Quantity, Remove_Cart_Item } from './Actions';
+import {
+  ActionTypes,
+  Add_Cart_Item,
+  Change_Cart_Quantity,
+  Remove_Cart_Item,
+} from './Actions';
 
+const cart = Cookie.get('cart');
+
+export interface ICart {
+  cartItems: Product[];
+}
 export interface State {
-  cart: {
-    cartItems: Product[];
-  };
+  cart: ICart;
 }
 
 export const initialState: State = {
-  cart: {
-    cartItems: [],
-  },
+  cart: cart ? JSON.parse(cart) : { cartItems: [] },
 };
 
 export const reducer = (
@@ -28,6 +35,7 @@ export const reducer = (
             item.name === existItem.name ? newItem : item
           )
         : [...state.cart.cartItems, newItem];
+        Cookie.set('cart', JSON.stringify({ ...state.cart, cartItems }));
       return { ...state, cart: { ...state.cart, cartItems } };
     }
     case Remove_Cart_Item: {
@@ -40,6 +48,7 @@ export const reducer = (
       const cartItems = state.cart.cartItems.filter(
         (item) => item.slug != payload.slug
       );
+      Cookie.set('cart', JSON.stringify({ ...state.cart, cartItems }));
       return { ...state, cart: { ...state.cart, cartItems } };
     }
     case Change_Cart_Quantity: {
@@ -49,9 +58,12 @@ export const reducer = (
       if (!existItem) {
         return state;
       }
-      const cartItems = state.cart.cartItems.map(
-        (item) => item.slug === payload.slug ? {...item, quantity: payload.quantity} : item
+      const cartItems = state.cart.cartItems.map((item) =>
+        item.slug === payload.slug
+          ? { ...item, quantity: payload.quantity }
+          : item
       );
+      Cookie.set('cart', JSON.stringify({ ...state.cart, cartItems }));
       return { ...state, cart: { ...state.cart, cartItems } };
     }
 

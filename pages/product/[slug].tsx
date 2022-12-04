@@ -45,6 +45,7 @@ function ProductPage() {
             alt={product.name}
             width={640}
             height={640}
+            priority={true}
           />
         </div>
         <div>
