@@ -1,18 +1,17 @@
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
 import { Store } from '../store/Store';
 
 function Header() {
+  const { data: session } = useSession();
   const { state } = useContext(Store);
   const { cart } = state;
   const [cartItemsCount, setCartItemsCount] = useState(0);
 
   useEffect(() => {
     setCartItemsCount(
-      cart.cartItems.reduce(
-        (prev, curr) => prev + (curr.quantity || 1),
-        0
-      )
+      cart.cartItems.reduce((prev, curr) => prev + (curr.quantity || 1), 0)
     );
   }, [cart.cartItems]);
 
@@ -48,11 +47,17 @@ function Header() {
             <span className="text-sm font-medium">Cart</span>
           </Link>
 
-          <Link
-            href="/login"
-            className="ml-2 flex cursor-pointer items-center gap-x-1 rounded-md border py-2 px-4 text-white hover:bg-gray-100  hover:text-gray-500 transition-colors">
-            <span className="text-sm font-medium">Sign in</span>
-          </Link>
+          {session?.user ? (
+            <div className="ml-2 cursor-pointer text-white py-2 px-4">
+              <span className="text-sm font-medium">{session?.user.name}</span>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="ml-2 cursor-pointer rounded-md border py-2 px-4 text-white hover:bg-gray-100  hover:text-gray-500 transition-colors">
+              <span className="text-sm font-medium">Sign in</span>
+            </Link>
+          )}
         </div>
       </nav>
     </header>

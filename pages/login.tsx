@@ -1,16 +1,26 @@
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
+import { getError } from '../utils/handle-error';
+import { signIn, useSession } from 'next-auth/react';
 
 type LoginInputs = {
   email: string;
   password: string;
 };
 function Login() {
-  const {query} = useRouter();
+  const { data: session } = useSession();
   const router = useRouter();
+  const { redirect } = router.query;
+
+  useEffect(() => {
+    if (session?.user) {
+      router.push((redirect as string) || '/');
+    }
+  }, [router, session, redirect]);
 
   const {
     register,
@@ -18,10 +28,21 @@ function Login() {
     formState: { errors },
   } = useForm<LoginInputs>();
 
-  const handleLogin: SubmitHandler<LoginInputs> = ({ email, password }) => {
-    console.log({ email, password });
-    if (query.redirect) {
-      router.push(query.redirect as string);
+  const handleLogin: SubmitHandler<LoginInputs> = async ({
+    email,
+    password,
+  }) => {
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+      });
+      if (result?.error) {
+        toast.error(result.error);
+      }
+    } catch (err) {
+      toast.error(getError(err));
     }
   };
 
@@ -40,11 +61,14 @@ function Login() {
           <input
             className="border rounded w-full px-3 py-2 text-sm leading-tight text-gray-700 shadow appearance-none"
             type="email"
-            {...register('email', { required: 'Email Address is required', pattern: {
-              value: /^([a-zA-Z0-9_\-\\.]+)@([a-zA-Z0-9_\-\\.]+)\.([a-zA-Z]{2,5})$/,
-              message: 'Envaild Email'
-
-            } })}
+            {...register('email', {
+              required: 'Email Address is required',
+              pattern: {
+                value:
+                  /^([a-zA-Z0-9_\-\\.]+)@([a-zA-Z0-9_\-\\.]+)\.([a-zA-Z]{2,5})$/,
+                message: 'Envaild Email',
+              },
+            })}
             aria-invalid={errors.email ? 'true' : 'false'}
             id="email"
             tabIndex={1}
@@ -64,11 +88,13 @@ function Login() {
           <input
             className="border rounded w-full px-3 py-2 text-sm leading-tight text-gray-700 shadow appearance-none"
             type="password"
-            {...register('password', { required: 'Please enter password' ,
-          minLength:{
-            value: 6,
-            message: 'Password must be at least 6 characters long'
-          }})}
+            {...register('password', {
+              required: 'Please enter password',
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters long',
+              },
+            })}
             aria-invalid={errors.password ? 'true' : 'false'}
             id="password"
             tabIndex={1}
