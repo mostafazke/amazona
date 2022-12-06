@@ -152,7 +152,7 @@ function Cart() {
             </div>
             <button
               className="primary-button w-full"
-              onClick={() => router.push('/shipping')}>
+              onClick={() => router.push('login?redirect=/shipping')}>
               Check Out
             </button>
           </div>
