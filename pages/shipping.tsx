@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import React, { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import CheckoutWizard from '../components/CheckoutWizard';
@@ -10,6 +11,7 @@ import { Store } from '../store/Store';
 type ShippingInputs = Address;
 
 function Shipping() {
+  const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const { shippingAddress } = state.cart;
   const {
@@ -29,6 +31,7 @@ function Shipping() {
 
   const submitHandler = (payload: Address) => {
     dispatch(new SaveShippingAddrsss(payload));
+    router.push('/payment');
   };
 
   return (

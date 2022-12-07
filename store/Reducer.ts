@@ -7,6 +7,7 @@ import {
   Cart_Reset,
   Change_Cart_Quantity,
   Remove_Cart_Item,
+  Save_Payment_Method,
   Save_Shipping_Addrsss,
 } from './Actions';
 
@@ -93,6 +94,18 @@ export const reducer = (
           ...state.cart.shippingAddress,
           ...payload,
         },
+      };
+      Cookie.set('cart', JSON.stringify({ ...cart }));
+
+      return {
+        ...state,
+        cart,
+      };
+    }
+    case Save_Payment_Method: {
+      const cart: ICart = {
+        ...state.cart,
+        paymentMethod: payload,
       };
       Cookie.set('cart', JSON.stringify({ ...cart }));
 

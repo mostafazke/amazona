@@ -25,10 +25,13 @@ export default function App({
 
 function Auth({ children }: { children: any }) {
   const router = useRouter();
+
   const { status } = useSession({
     required: true,
     onUnauthenticated() {
-      router.push('/unauthorized?message=login required');
+      router.push(
+        `/unauthorized?redirect=${router.pathname}&message=login required`
+      );
     },
   });
 

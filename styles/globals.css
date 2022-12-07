@@ -12,12 +12,24 @@
   }
 }
 
+a {
+  @apply text-blue-600 hover:text-blue-800;
+}
+
 .card {
   @apply mb-5 block rounded-lg shadow-md bg-white shadow-slate-300 border border-gray-200;
 }
 
 .primary-button {
   @apply py-2 px-4 shadow outline-none hover:bg-amber-500  active:bg-amber-500 font-medium text-white bg-primary  border-amber-500;
+}
+
+.default-button {
+  @apply py-2 px-4 shadow outline-none hover:bg-amber-500  active:bg-amber-500 font-medium text-white bg-primary  border-amber-500;
+}
+
+.default-button {
+  @apply py-2  px-4 shadow outline-none hover:bg-gray-200  active:bg-gray-300 font-medium  text-black bg-gray-100 border-gray-300;
 }
 
 input,
