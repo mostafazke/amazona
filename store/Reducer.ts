@@ -3,6 +3,7 @@ import { Product } from '../models';
 import {
   ActionTypes,
   Add_Cart_Item,
+  Cart_Reset,
   Change_Cart_Quantity,
   Remove_Cart_Item,
 } from './Actions';
@@ -35,7 +36,7 @@ export const reducer = (
             item.name === existItem.name ? newItem : item
           )
         : [...state.cart.cartItems, newItem];
-        Cookie.set('cart', JSON.stringify({ ...state.cart, cartItems }));
+      Cookie.set('cart', JSON.stringify({ ...state.cart, cartItems }));
       return { ...state, cart: { ...state.cart, cartItems } };
     }
     case Remove_Cart_Item: {
@@ -65,6 +66,9 @@ export const reducer = (
       );
       Cookie.set('cart', JSON.stringify({ ...state.cart, cartItems }));
       return { ...state, cart: { ...state.cart, cartItems } };
+    }
+    case Cart_Reset: {
+      return { ...state, cart: initialState.cart };
     }
 
     default:

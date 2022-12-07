@@ -1,20 +1,29 @@
-import { useSession } from 'next-auth/react';
+import { Menu, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import Cookies from 'js-cookie';
+import { signOut, useSession } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
-import React, { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
+import { CartReset } from '../store/Actions';
 import { Store } from '../store/Store';
 
 function Header() {
   const { data: session } = useSession();
-  const { state } = useContext(Store);
+  const { state, dispatch } = useContext(Store);
   const { cart } = state;
   const [cartItemsCount, setCartItemsCount] = useState(0);
-
   useEffect(() => {
     setCartItemsCount(
       cart.cartItems.reduce((prev, curr) => prev + (curr.quantity || 1), 0)
     );
   }, [cart.cartItems]);
 
+  const handleLogout = () => {
+    Cookies.remove('cart');
+    dispatch(new CartReset());
+    signOut({ callbackUrl: '/login' });
+  };
   return (
     <header className="bg-primary py-3 px-6 shadow-md">
       <nav className="flex justify-between">
@@ -48,9 +57,69 @@ function Header() {
           </Link>
 
           {session?.user ? (
-            <div className="ml-2 cursor-pointer text-white py-2 px-4">
-              <span className="text-sm font-medium">{session?.user.name}</span>
-            </div>
+            <Menu as="div" className="relative inline-block">
+              <Menu.Button className="relative z-10 flex items-center p-2 text-sm  ml-2 cursor-pointer rounded-md border py-2 px-4 text-white hover:bg-gray-100  hover:text-gray-500 transition-colors">
+                <span className="mx-1">{session?.user.name}</span>
+                <ChevronDownIcon className="h-5 w-5" />
+              </Menu.Button>
+
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95">
+                <Menu.Items className="absolute right-0 z-20 w-56 py-2 mt-2 overflow-hidden bg-white rounded-md shadow-xl dark:bg-gray-800">
+                  <Menu.Item>
+                    <Link
+                      href="/profile"
+                      className="flex items-center p-3 -mt-2 text-sm text-gray-600 transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                      <Image
+                        className="flex-shrink-0 object-cover mx-1 rounded-full w-9 h-9"
+                        width={32}
+                        height={32}
+                        src={`/avatar.jpg` || session?.user.image}
+                        alt="avatar"
+                      />
+                      <div className="mx-1">
+                        <h1 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                          {session?.user.name}
+                        </h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {session?.user.email}
+                        </p>
+                      </div>
+                    </Link>
+                  </Menu.Item>
+                  <hr className="border-gray-200 dark:border-gray-700" />
+                  <Menu.Item>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                      view profile
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item>
+                      <Link
+                        href="/order-history"
+                        className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                        Order History
+                      </Link>
+
+                  </Menu.Item>
+                  <hr className="border-gray-200 dark:border-gray-700" />
+                  <Menu.Item>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full block text-start px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                      Sign Out
+                    </button>
+                  </Menu.Item>
+                </Menu.Items>
+              </Transition>
+            </Menu>
           ) : (
             <Link
               href="/login"
