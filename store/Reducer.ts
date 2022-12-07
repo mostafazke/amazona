@@ -1,24 +1,40 @@
 import Cookie from 'js-cookie';
-import { Product } from '../models';
+import { PaymentMethods } from '../enums';
+import { Address, Product } from '../models';
 import {
   ActionTypes,
   Add_Cart_Item,
   Cart_Reset,
   Change_Cart_Quantity,
   Remove_Cart_Item,
+  Save_Shipping_Addrsss,
 } from './Actions';
 
 const cart = Cookie.get('cart');
 
 export interface ICart {
   cartItems: Product[];
+  shippingAddress: Address;
+  paymentMethod: PaymentMethods;
 }
 export interface State {
   cart: ICart;
 }
 
 export const initialState: State = {
-  cart: cart ? JSON.parse(cart) : { cartItems: [] },
+  cart: cart
+    ? (JSON.parse(cart) as ICart)
+    : {
+        cartItems: [],
+        paymentMethod: PaymentMethods.Cash,
+        shippingAddress: {
+          fullName: '',
+          address: '',
+          city: '',
+          country: '',
+          postalCode: '',
+        },
+      },
 };
 
 export const reducer = (
@@ -70,7 +86,21 @@ export const reducer = (
     case Cart_Reset: {
       return { ...state, cart: initialState.cart };
     }
+    case Save_Shipping_Addrsss: {
+      const cart = {
+        ...state.cart,
+        shippingAddress: {
+          ...state.cart.shippingAddress,
+          ...payload,
+        },
+      };
+      Cookie.set('cart', JSON.stringify({ ...cart }));
 
+      return {
+        ...state,
+        cart,
+      };
+    }
     default:
       return state;
   }

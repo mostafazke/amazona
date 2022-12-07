@@ -9,14 +9,10 @@ export default NextAuth({
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }: any) {
-      if (user?._id) token._id = user._id;
-      if (user?.isAdmin) token.isAdmin = user.isAdmin;
+    async jwt({ token }) {
       return token;
     },
-    async session({ session, token }: any) {
-      if (token?._id) session.user._id = token._id;
-      if (token?.isAdmin) session.user.isAdmin = token.isAdmin;
+    async session({ session }) {
       return session;
     },
   },
@@ -28,8 +24,6 @@ export default NextAuth({
         password: {},
       },
       async authorize(credentials) {
-        console.log('Start authorize..........');
-
         if (!credentials) {
           throw new Error('Required email and password');
         }
@@ -41,7 +35,6 @@ export default NextAuth({
         if (user && bcryptjs.compareSync(credentials.password, user.password)) {
           return {
             id: user._id,
-            _id: user._id,
             name: user.name,
             email: user.email,
             image: 'f',

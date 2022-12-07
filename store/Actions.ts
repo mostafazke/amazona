@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { Product } from '../models';
+import { Address, Product } from '../models';
 
 export const Add_Cart_Item = '[Cart] Add_Cart_Item';
 export const Remove_Cart_Item = '[Cart] Remove_Cart_Item';
 export const Change_Cart_Quantity = '[Cart] Change_Cart_Quantity';
 export const Cart_Reset = '[Cart] Cart_Reset';
+export const Save_Shipping_Addrsss = '[Shipping] Save_Shipping_Addrsss';
 
 export class AddCartItem {
   readonly type = Add_Cart_Item;
@@ -24,8 +25,14 @@ export class CartReset {
   constructor(public payload?: undefined) {}
 }
 
+export class SaveShippingAddrsss {
+  readonly type = Save_Shipping_Addrsss;
+  constructor(public payload: Address) {}
+}
+
 export type ActionTypes =
   | AddCartItem
   | RemoveCartItem
   | ChangeCartQuantity
-  | CartReset;
+  | CartReset
+  | SaveShippingAddrsss;
