@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { Product } from '../models';
+import { IProduct } from '../models';
 import { formatCurrency } from '../utils/formatCurrency';
 
 type Props = {
-  product: Product;
+  product: IProduct;
   // eslint-disable-next-line no-unused-vars
-  addToCartHandler: (product: Product) => void;
+  addToCartHandler: (product: IProduct) => void;
 };
 
 export function ProductCard({ product, addToCartHandler }: Props) {

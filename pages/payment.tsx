@@ -66,5 +66,11 @@ function Payment() {
     </Layout>
   );
 }
-
+export async function getStaticProps() {
+  return {
+    props: {
+      protected: true,
+    },
+  };
+}
 export default Payment;

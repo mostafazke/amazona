@@ -7,12 +7,17 @@ import db from '../../../utils/db';
 export default NextAuth({
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token }) {
+    async jwt({ token, user }) {
+      if (user?.id) token.id = user.id;
+      // if (user?.isAdmin) token.isAdmin = user.isAdmin;
       return token;
     },
-    async session({ session }) {
+    async session({ session, token }) {
+      if (token?.id) session.user.id = token.id as string;
+      // if (token?.isAdmin) session.user.isAdmin = token.isAdmin;
       return session;
     },
   },
@@ -34,6 +39,7 @@ export default NextAuth({
         await db.disconnect();
         if (user && bcryptjs.compareSync(credentials.password, user.password)) {
           return {
+            _id: user._id,
             id: user._id,
             name: user.name,
             email: user.email,
@@ -45,4 +51,5 @@ export default NextAuth({
       },
     }),
   ],
+  secret: process.env.SECRET,
 });
