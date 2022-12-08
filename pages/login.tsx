@@ -113,7 +113,7 @@ function Login() {
         <div className="mb-4">
           <p>
             Don&apos;t have an account?&nbsp;
-            <Link href="/register">Register</Link>
+            <Link href={`/register?redirect=${redirect}`}>Register</Link>
           </p>
         </div>
       </form>
