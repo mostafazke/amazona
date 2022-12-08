@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { LeanDocument } from 'mongoose';
 
 const MONGODB_URI: string = process.env.MONGODB_URI as string;
 let isConnected: any = null;
@@ -31,12 +31,12 @@ async function disconnect() {
     }
   }
 }
-// function convertDocToObj(doc) {
-//   doc._id = doc._id.toString();
-//   doc.createdAt = doc.createdAt.toString();
-//   doc.updatedAt = doc.updatedAt.toString();
-//   return doc;
-// }
+function convertDocToObj(doc: LeanDocument<any>) {
+  doc._id = doc._id.toString();
+  doc.createdAt = doc.createdAt.toString();
+  doc.updatedAt = doc.updatedAt.toString();
+  return doc;
+}
 
-const db = { connect, disconnect };
+const db = { connect, disconnect, convertDocToObj };
 export default db;

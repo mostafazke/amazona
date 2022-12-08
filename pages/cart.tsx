@@ -4,12 +4,14 @@ import React, { useContext } from 'react';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 
 import Layout from '../components/Layout';
-import { Product } from '../models';
+import { IProduct } from '../models';
 import { ChangeCartQuantity, RemoveCartItem } from '../store/Actions';
 import { Store } from '../store/Store';
 import { formatCurrency } from '../utils/formatCurrency';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function Cart() {
   const router = useRouter();
@@ -19,18 +21,26 @@ function Cart() {
     (prev, curr) => prev + (curr.quantity || 1) * curr.price,
     0
   );
-  const handleRemoveItem = (product: Product) => {
+  const handleRemoveItem = (product: IProduct) => {
     dispatch(new RemoveCartItem(product));
   };
-  const handleChangeQuantity = ({
-    slug,
-    quantity,
+  const handleChangeQuantity = async ({
+    item,
+    qty,
   }: {
-    slug: string;
-    quantity: string;
+    item: IProduct;
+    qty: string;
   }) => {
+    const quantity = +qty;
+
+    const { data } = await axios.get<IProduct>(`/api/products/${item._id}`);
+    if (data.countInStock < quantity) {
+      toast.error('Sorry, Product is out of stock.');
+      return;
+    }
+
     const paylaod = {
-      slug,
+      slug: item.slug,
       quantity: +quantity,
     };
     dispatch(new ChangeCartQuantity(paylaod));
@@ -100,8 +110,8 @@ function Cart() {
                             value={product.quantity}
                             onChange={(e) =>
                               handleChangeQuantity({
-                                slug: product.slug,
-                                quantity: e.target.value,
+                                item: product,
+                                qty: e.target.value,
                               })
                             }>
                             {[...Array(product.countInStock).keys()].map(
@@ -146,7 +156,8 @@ function Cart() {
           <div className="card p-5">
             <div className="mb-2">
               <h4>
-                Total ({cart.cartItems.reduce((p, c) => c.quantity! + p, 0)}
+                Total (
+                {cart.cartItems.reduce((p, c) => (c.quantity || 1) + p, 0)}
                 ): {formatCurrency(total)}
               </h4>
             </div>

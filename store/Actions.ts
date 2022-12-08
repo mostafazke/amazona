@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { PaymentMethods } from '../enums';
-import { Address, Product } from '../models';
+import { Address, IProduct } from '../models';
 
 export const Add_Cart_Item = '[Cart] Add_Cart_Item';
 export const Remove_Cart_Item = '[Cart] Remove_Cart_Item';
@@ -11,11 +11,11 @@ export const Save_Payment_Method = '[Shipping] Save_Payment_Method';
 
 export class AddCartItem {
   readonly type = Add_Cart_Item;
-  constructor(public payload: Product) {}
+  constructor(public payload: IProduct) {}
 }
 export class RemoveCartItem {
   readonly type = Remove_Cart_Item;
-  constructor(public payload: Product) {}
+  constructor(public payload: IProduct) {}
 }
 
 export class ChangeCartQuantity {

@@ -1,36 +1,41 @@
+import axios from 'axios';
+import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useContext } from 'react';
+import { ParsedUrlQuery } from 'querystring';
+import { useContext } from 'react';
+import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
-import { Product } from '../../models';
+import { IProduct, Product } from '../../models';
 import { AddCartItem } from '../../store/Actions';
 import { Store } from '../../store/Store';
-import data from '../../utils/data';
+import db from '../../utils/db';
 import { formatCurrency } from '../../utils/formatCurrency';
 
-function ProductPage() {
+function ProductPage({ product }: { product: IProduct }) {
   const { state, dispatch } = useContext(Store);
-  const { query } = useRouter();
-  const { slug } = query;
-  const product: Product | undefined = data.products.find(
-    (p) => p.slug === slug
-  );
+  const { cart } = state;
+
   if (!product) {
-    return <div>Product not found.</div>;
+    return (
+      <Layout title="Not found">
+        <div className="text-center mt-5">
+          <h1 className="text-xl font-bold">Product not found.</h1>
+        </div>
+      </Layout>
+    );
   }
 
-  const addToCartHandler = () => {
-    const existItem = state.cart.cartItems.find(
-      (item) => item.slug === product.slug
-    );
+  const addToCartHandler = async () => {
+    const existItem = cart.cartItems.find((item) => item.slug === product.slug);
     const quantity = existItem ? (existItem.quantity || 0) + 1 : 1;
-
-    if (product.countInStock < quantity) {
-      alert('Sorry, Product is out of stock.')
+    const { data } = await axios.get<IProduct>(`/api/products/${product._id}`);
+    if (data.countInStock < quantity) {
+      toast.error('Sorry, Product is out of stock.');
       return;
     }
     dispatch(new AddCartItem({ ...product, quantity }));
+    toast.success('Product added to the cart');
   };
 
   return (
@@ -82,5 +87,20 @@ function ProductPage() {
     </Layout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { params } = context;
+  const { slug } = params as ParsedUrlQuery;
+
+  await db.connect();
+  const product = await Product.findOne({ slug }).lean();
+  await db.disconnect();
+
+  return {
+    props: {
+      product: product ? db.convertDocToObj(product) : null,
+    },
+  };
+};
 
 export default ProductPage;

@@ -1,6 +1,6 @@
 import Cookie from 'js-cookie';
 import { PaymentMethods } from '../enums';
-import { Address, Product } from '../models';
+import { Address, IProduct } from '../models';
 import {
   ActionTypes,
   Add_Cart_Item,
@@ -14,7 +14,7 @@ import {
 const cart = Cookie.get('cart');
 
 export interface ICart {
-  cartItems: Product[];
+  cartItems: IProduct[];
   shippingAddress: Address;
   paymentMethod: PaymentMethods;
 }
