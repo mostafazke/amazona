@@ -71,7 +71,7 @@ function Placeorder() {
         </div>
       ) : (
         <>
-          <h1 className="text-lx font-bold mb-4">Place Order</h1>
+          <h1 className="text-xl font-bold mb-4">Place Order</h1>
           <div className="grid md:grid-cols-4 md:gap-5">
             <div className="overflow-x-auto md:col-span-3">
               <div className="card min-w-full p-5 font-semibold">

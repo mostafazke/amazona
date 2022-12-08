@@ -8,6 +8,7 @@ export interface IOrderItem {
   price: number;
 }
 export interface IOrder {
+  _id: string;
   user: Types.ObjectId;
   orderItems: IOrderItem[];
   shippingAddress: Address;
