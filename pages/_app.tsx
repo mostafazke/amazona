@@ -3,6 +3,11 @@ import type { AppProps } from 'next/app';
 import { StoreProvider } from '../store/Store';
 import { SessionProvider, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+
+const initialOptions = {
+  'client-id': '',
+};
 
 export default function App({
   Component,
@@ -11,13 +16,15 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <StoreProvider>
-        {pageProps.protected ? (
-          <Auth>
+        <PayPalScriptProvider options={initialOptions} deferLoading={true}>
+          {pageProps.protected ? (
+            <Auth>
+              <Component {...pageProps} />
+            </Auth>
+          ) : (
             <Component {...pageProps} />
-          </Auth>
-        ) : (
-          <Component {...pageProps} />
-        )}
+          )}
+        </PayPalScriptProvider>
       </StoreProvider>
     </SessionProvider>
   );

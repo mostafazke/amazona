@@ -1,6 +1,11 @@
 import { model, models, Schema, Types } from 'mongoose';
 import { Address } from './address.model';
 
+export interface IPaymentResult {
+  id: string;
+  status: string;
+  email_address: string;
+}
 export interface IOrderItem {
   name: string;
   quantity: number;
@@ -13,6 +18,7 @@ export interface IOrder {
   orderItems: IOrderItem[];
   shippingAddress: Address;
   paymentMethod: string;
+  paymentResult: IPaymentResult;
   itemsPrice: number;
   shippingPrice: number;
   taxPrice: number;
@@ -42,6 +48,11 @@ const orderSchema = new Schema<IOrder>(
       country: { type: String, required: true },
     },
     paymentMethod: { type: String, required: true },
+    paymentResult: {
+      id: { type: String },
+      status: { type: String },
+      email_address: { type: String },
+    },
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true },
     taxPrice: { type: Number, required: true },
