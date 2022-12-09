@@ -27,6 +27,8 @@ export interface IOrder {
   isDelivered: boolean;
   deliveredAt: Date;
   paidAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const orderSchema = new Schema<IOrder>(
