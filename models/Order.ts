@@ -1,5 +1,6 @@
-import { model, models, Schema, Types } from 'mongoose';
+import { model, models, Schema } from 'mongoose';
 import { Address } from './address.model';
+import { IUser } from './User';
 
 export interface IPaymentResult {
   id: string;
@@ -14,7 +15,7 @@ export interface IOrderItem {
 }
 export interface IOrder {
   _id: string;
-  user: Types.ObjectId;
+  user: IUser;
   orderItems: IOrderItem[];
   shippingAddress: Address;
   paymentMethod: string;

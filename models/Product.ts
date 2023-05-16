@@ -12,7 +12,7 @@ export interface IProduct {
   numReviews: number;
   countInStock: number;
   description: string;
-  isFeatured?: boolean;
+  isFeatured: boolean;
   banner?: string;
   quantity?: number;
 }
@@ -29,7 +29,7 @@ const productSchema = new Schema<IProduct>(
     numReviews: { type: Number, required: true, default: 0 },
     countInStock: { type: Number, required: true, default: 0 },
     description: { type: String, required: true },
-    isFeatured: { type: Boolean },
+    isFeatured: { type: Boolean, required: true, default: false },
     banner: { type: String },
   },
   {
