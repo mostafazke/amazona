@@ -19,7 +19,7 @@ export function ProductCard({ product, addToCartHandler }: Props) {
         <Link href={`/product/${product.slug}`}>
           <picture>
             <img
-              className="rounded rounded-b-none"
+              className="rounded rounded-b-none object-cover h-64 w-full"
               src={product.image}
               alt={product.name}
             />

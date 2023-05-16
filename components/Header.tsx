@@ -1,10 +1,14 @@
 import { Menu, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import {
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/20/solid';
 import Cookies from 'js-cookie';
 import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Fragment, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { FormEvent, Fragment, useContext, useEffect, useState } from 'react';
 import { CartReset } from '../store/Actions';
 import { Store } from '../store/Store';
 
@@ -24,6 +28,15 @@ function Header() {
     dispatch(new CartReset());
     signOut({ callbackUrl: '/login' });
   };
+
+  const [query, setQuery] = useState('');
+
+  const router = useRouter();
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    router.push(`/search?query=${query}`);
+  };
+
   return (
     <header className="bg-primary py-3 px-6 shadow-md">
       <nav className="flex justify-between">
@@ -34,6 +47,23 @@ function Header() {
             </span>
           </Link>
         </div>
+
+        <form
+          onSubmit={submitHandler}
+          className="mx-auto  hidden w-full justify-center md:flex">
+          <input
+            onChange={(e) => setQuery(e.target.value)}
+            type="text"
+            className="rounded-tr-none rounded-br-none p-1 text-sm   focus:ring-0"
+            placeholder="Search products..."
+          />
+          <button
+            className="rounded rounded-tl-none rounded-bl-none bg-secondary p-1 text-sm dark:text-primary"
+            type="submit"
+            id="button-addon2">
+            <MagnifyingGlassIcon className="h-5 w-5"></MagnifyingGlassIcon>
+          </button>
+        </form>
 
         <div className="ml-2 flex">
           <Link
@@ -102,13 +132,21 @@ function Header() {
                     </Link>
                   </Menu.Item>
                   <Menu.Item>
-                      <Link
-                        href="/order-history"
-                        className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Order History
-                      </Link>
-
+                    <Link
+                      href="/order-history"
+                      className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                      Order History
+                    </Link>
                   </Menu.Item>
+                  {session.user.isAdmin && (
+                    <Menu.Item>
+                      <Link
+                        href="/admin/dashboard"
+                        className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                        Admin Dashboard
+                      </Link>
+                    </Menu.Item>
+                  )}
                   <hr className="border-gray-200 dark:border-gray-700" />
                   <Menu.Item>
                     <button

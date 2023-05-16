@@ -4,6 +4,7 @@ import {
   usePayPalScriptReducer,
 } from '@paypal/react-paypal-js';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -21,11 +22,18 @@ type Action =
   | { type: 'PAY_REQUEST' }
   | { type: 'PAY_SUCCESS' }
   | { type: 'PAY_FAIL'; payload: string }
-  | { type: 'PAY_RESET' };
+  | { type: 'PAY_RESET' }
+  | { type: 'DELIVER_REQUEST' }
+  | { type: 'DELIVER_SUCCESS' }
+  | { type: 'DELIVER_FAIL'; payload: string }
+  | { type: 'DELIVER_RESET' };
 
 type State = {
   loading: boolean;
   loadingPay: boolean;
+  loadingDeliver: boolean;
+  successDeliver: boolean;
+  errorDeliver: string;
   successPay: boolean;
   errorPay: string;
   order: IOrder | null;
@@ -47,26 +55,54 @@ function reducer(state: State, action: Action): State {
       return { ...state, loadingPay: false, errorPay: action.payload };
     case 'PAY_RESET':
       return { ...state, loadingPay: false, successPay: false, errorPay: '' };
-
+    case 'DELIVER_REQUEST':
+      return { ...state, loadingDeliver: true };
+    case 'DELIVER_SUCCESS':
+      return { ...state, loadingDeliver: false, successDeliver: true };
+    case 'DELIVER_FAIL':
+      return { ...state, loadingDeliver: false, errorDeliver: action.payload };
+    case 'DELIVER_RESET':
+      return {
+        ...state,
+        loadingDeliver: false,
+        successDeliver: false,
+        errorDeliver: '',
+      };
     default:
       return state;
   }
 }
 
 function OrderScreen() {
+  const { data: session } = useSession();
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
   const { query } = useRouter();
   const orderId = query.id;
 
-  const [{ loading, error, order, successPay, loadingPay }, dispatch] =
-    useReducer(reducer, {
-      loading: true,
-      order: null,
-      error: '',
-      loadingPay: true,
-      successPay: true,
-      errorPay: '',
-    });
+  const [
+    {
+      loading,
+      error,
+      order,
+      successPay,
+      loadingPay,
+      errorPay,
+      loadingDeliver,
+      successDeliver,
+      errorDeliver,
+    },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    order: null,
+    error: '',
+    loadingPay: true,
+    successPay: true,
+    errorPay: '',
+    loadingDeliver: true,
+    successDeliver: true,
+    errorDeliver: '',
+  });
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -79,12 +115,17 @@ function OrderScreen() {
       }
     };
     if (
-      orderId &&
-      (!order?._id || successPay || (order._id && order._id !== orderId))
+      !order?._id ||
+      successPay ||
+      successDeliver ||
+      (order._id && order._id !== orderId)
     ) {
       fetchOrder();
       if (successPay) {
         dispatch({ type: 'PAY_RESET' });
+      }
+      if (successDeliver) {
+        dispatch({ type: 'DELIVER_RESET' });
       }
     } else {
       const loadPaypalScript = async () => {
@@ -103,7 +144,7 @@ function OrderScreen() {
       };
       loadPaypalScript();
     }
-  }, [order, orderId, paypalDispatch, successPay]);
+  }, [order, orderId, paypalDispatch, successDeliver, successPay]);
 
   function createOrder(_: any, actions: any) {
     return actions.order
@@ -136,6 +177,18 @@ function OrderScreen() {
   }
   function onError(err: unknown) {
     toast.error(getError(err));
+  }
+
+  async function deliverOrderHandler() {
+    try {
+      dispatch({ type: 'DELIVER_REQUEST' });
+      await axios.put(`/api/admin/orders/${order?._id}/deliver`, {});
+      dispatch({ type: 'DELIVER_SUCCESS' });
+      toast.success('Order is delivered');
+    } catch (err) {
+      dispatch({ type: 'DELIVER_FAIL', payload: getError(err) });
+      toast.error(getError(err));
+    }
   }
 
   if (error) {
@@ -317,8 +370,29 @@ function OrderScreen() {
                       </div>
                     )}
                     {loadingPay && <div>Loading...</div>}
+                    {errorPay && (
+                      <span className="text-red-600">{errorPay}</span>
+                    )}
                   </div>
                 )}
+
+                {session?.user.isAdmin &&
+                  order.isPaid &&
+                  !order.isDelivered && (
+                    <p className="flex mb-2 font-bold">
+                      {errorDeliver ? (
+                        <span className="text-red-600">{errorDeliver}</span>
+                      ) : loadingDeliver ? (
+                        <span>Loading...</span>
+                      ) : (
+                        <button
+                          className="primary-button w-full"
+                          onClick={deliverOrderHandler}>
+                          Deliver Order
+                        </button>
+                      )}
+                    </p>
+                  )}
               </div>
             </div>
           </div>
@@ -327,5 +401,11 @@ function OrderScreen() {
     </Layout>
   );
 }
-
+export async function getStaticProps() {
+  return {
+    props: {
+      protected: true,
+    },
+  };
+}
 export default OrderScreen;
