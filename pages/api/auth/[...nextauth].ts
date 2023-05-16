@@ -12,12 +12,12 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user?.id) token.id = user.id;
-      // if (user?.isAdmin) token.isAdmin = user.isAdmin;
+      if (user?.isAdmin) token.isAdmin = user.isAdmin;
       return token;
     },
     async session({ session, token }) {
       if (token?.id) session.user.id = token.id as string;
-      // if (token?.isAdmin) session.user.isAdmin = token.isAdmin;
+      if (token?.isAdmin) session.user.isAdmin = token.isAdmin as boolean;
       return session;
     },
   },
